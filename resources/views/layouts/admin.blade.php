@@ -601,7 +601,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
     <!-- Include Select2 JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>|
+
+    <!-- DataTables Buttons JS and Dependencies -->
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
     <script>
         $(document).ready(function() {
             // Initialize Select2
@@ -790,7 +799,88 @@
                 ],
                 pageLength: 10,
                 responsive: true,
-                scrollX: true
+                scrollX: true,
+                autoWidth: false
+            });
+        });
+    </script>
+
+    {{-- <script>
+        $(document).ready(function() {
+            $('#dataTableReport').DataTable({
+                paging: true, // Enables pagination
+                searching: true,
+                ordering: true,
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
+                pageLength: 10,
+                responsive: true,
+                scrollX: true,
+                autoWidth: false,
+                dom: '<"top"B><"clear"><"middle"lf>rt<"bottom"ip>', // Customized dom option
+                buttons: [{
+                        extend: 'excelHtml5',
+                        text: '<i class="fas fa-file-excel"></i>',
+                        className: 'btn btn-success',
+                        titleAttr: 'Export to Excel'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fas fa-file-pdf"></i>',
+                        className: 'btn btn-danger',
+                        titleAttr: 'Export to PDF',
+                        orientation: 'landscape',
+                        pageSize: 'A4'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print"></i>',
+                        className: 'btn btn-primary',
+                        titleAttr: 'Print'
+                    }
+                ]
+            });
+        });
+    </script> --}}
+
+    <script>
+        $(document).ready(function() {
+            $('#dataTableReport').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
+                pageLength: 10,
+                responsive: true,
+                scrollX: true,
+                autoWidth: false,
+                dom: '<"top d-flex justify-content-between align-items-center"lBf>rt<"bottom"ip>',
+                buttons: [{
+                        extend: 'excelHtml5',
+                        text: '<i class="fas fa-file-excel"></i>',
+                        className: 'btn btn-success',
+                        titleAttr: 'Export to Excel'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fas fa-file-pdf"></i>',
+                        className: 'btn btn-danger',
+                        titleAttr: 'Export to PDF',
+                        orientation: 'landscape',
+                        pageSize: 'A4'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print"></i>',
+                        className: 'btn btn-primary',
+                        titleAttr: 'Print'
+                    }
+                ]
             });
         });
     </script>
