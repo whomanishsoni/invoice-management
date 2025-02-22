@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
              'name' => 'Manish',
              'last_name' => 'Soni',
              'password' => '12345678',
-             'email' => 'whomanishsoni@gmail.com',
+             'email' => 'admin@gmail.com',
          ]);
     }
 }

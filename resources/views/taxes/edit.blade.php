@@ -1,6 +1,16 @@
 @extends('layouts.admin')
 
 @section('main-content')
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ route('taxes.index') }}">Taxes</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Edit Tax</li>
+        </ol>
+    </nav>
+    
     <!-- Page Heading -->
     <h1 class="h3 mb-4 text-gray-800">{{ __('Edit Tax') }}</h1>
 

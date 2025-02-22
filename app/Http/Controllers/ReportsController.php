@@ -75,7 +75,8 @@ class ReportsController extends Controller
             })
             ->get();
 
-        // Return the view with transactions, customers, vendors, and vehicles
-        return view('reports.transactions', compact('transactions', 'type', 'customers', 'vendors', 'vehicles'));
+        $totalReceivedAmount = $transactions->sum('amount');
+
+        return view('reports.transactions', compact('transactions', 'type', 'customers', 'vendors', 'vehicles', 'totalReceivedAmount'));
     }
 }

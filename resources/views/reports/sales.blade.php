@@ -132,12 +132,18 @@
                                 <th>Customer</th>
                                 <th>Kanta Weight</th>
                                 <th>Rate</th>
-                                <th>Total</th>
+                                <th>Amount</th>
                                 <th>Tax Rate (%)</th>
                                 <th>Tax Amount</th>
+                                <th>Total Amount</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $totalAmount = 0;
+                                $totalTaxAmount = 0;
+                                $totalAmountAfterTax = 0;
+                            @endphp
                             @foreach ($sales as $index => $sale)
                                 @php
                                     $amount = $sale->kanta_weight * $sale->rate;
@@ -145,6 +151,11 @@
                                         ? optional($sale->rawana->rawanaItems->first())->tax_rate
                                         : 0;
                                     $tax_amount = ($amount * $tax_rate) / 100;
+                                    $totalAmountAfterTaxRow = $amount + $tax_amount;
+
+                                    $totalAmount += $amount;
+                                    $totalTaxAmount += $tax_amount;
+                                    $totalAmountAfterTax += $totalAmountAfterTaxRow;
                                 @endphp
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
@@ -154,12 +165,22 @@
                                     <td>{{ strtoupper($sale->customer->name ?? 'N/A') }}</td>
                                     <td>{{ number_format($sale->kanta_weight, 2) }}</td>
                                     <td>{{ number_format($sale->rate, 2) }}</td>
-                                    <td>{{ number_format($sale->total, 2) }}</td>
+                                    <td>{{ number_format($amount, 2) }}</td>
                                     <td>{{ number_format($tax_rate, 2) }}</td>
                                     <td>{{ number_format($tax_amount, 2) }}</td>
+                                    <td>{{ number_format($totalAmountAfterTaxRow, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="7" style="text-align:right">Total:</th>
+                                <th>{{ number_format($totalAmount, 2) }}</th>
+                                <th></th>
+                                <th>{{ number_format($totalTaxAmount, 2) }}</th>
+                                <th>{{ number_format($totalAmountAfterTax, 2) }}</th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>

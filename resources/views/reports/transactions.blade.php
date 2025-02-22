@@ -1,6 +1,41 @@
 @extends('layouts.admin')
 
 @section('main-content')
+    <style>
+        .dataTables_wrapper .top {
+            gap: 10px;
+        }
+
+        .dataTables_filter {
+            text-align: right !important;
+            margin-left: auto;
+        }
+
+        .dataTables_wrapper .middle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            display: inline-block;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            margin-left: 10px;
+        }
+
+        .dataTables_wrapper .bottom {
+            margin-top: 10px;
+        }
+
+        .text-danger {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
     <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -27,7 +62,7 @@
         <div class="card shadow mb-4">
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
                 <h6 class="m-0 font-weight-bold text-primary">Filter Transactions</h6>
-                <a href="#" class="text-primary" data-toggle="collapse" data-target="#filterCollapse"
+                <a href="#" class="collapse-item text-primary" data-toggle="collapse" data-target="#filterCollapse"
                     aria-expanded="true" aria-controls="filterCollapse">
                     <i class="fas fa-chevron-down"></i>
                 </a>
@@ -54,12 +89,6 @@
                                 style="display: {{ $type === 'in' ? 'block' : 'none' }};">
                                 <label for="customer_id">Customer</label>
                                 <select name="customer_id" id="customer_id" class="form-control select2">
-                                    <option value="">Select Customer</option>
-                                    @foreach ($customers as $customer)
-                                        <option value="{{ $customer->id }}"
-                                            {{ request('customer_id') == $customer->id ? 'selected' : '' }}>
-                                            {{ $customer->name }}</option>
-                                    @endforeach
                                 </select>
                             </div>
                             <!-- Vendor Dropdown (Visible for 'out' transactions) -->
@@ -67,12 +96,6 @@
                                 style="display: {{ $type === 'out' ? 'block' : 'none' }};">
                                 <label for="vendor_id">Vendor</label>
                                 <select name="vendor_id" id="vendor_id" class="form-control select2">
-                                    <option value="">Select Vendor</option>
-                                    @foreach ($vendors as $vendor)
-                                        <option value="{{ $vendor->id }}"
-                                            {{ request('vendor_id') == $vendor->id ? 'selected' : '' }}>
-                                            {{ $vendor->name }}</option>
-                                    @endforeach
                                 </select>
                             </div>
                             <!-- Vehicle Dropdown (Visible for 'out' transactions) -->
@@ -108,17 +131,19 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered display nowrap" id="dataTableReport" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Date</th>
                                 <th>Amount</th>
-                                <th>Type</th>
                                 <th>Method</th>
-                                <th>Customer</th>
-                                <th>Vendor</th>
-                                <th>Vehicle</th>
+                                @if ($type === 'in')
+                                    <th>Customer</th>
+                                @else
+                                    <th>Vendor</th>
+                                    <th>Vehicle</th>
+                                @endif
                                 <th>Reference</th>
                             </tr>
                         </thead>
@@ -128,33 +153,47 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $transaction->date }}</td>
                                     <td>{{ number_format($transaction->amount, 2) }}</td>
-                                    <td>{{ ucfirst($transaction->type) }}</td>
                                     <td>{{ ucfirst(str_replace('_', ' ', $transaction->method)) }}</td>
-                                    <td>
-                                        @if ($transaction->customer)
-                                            {{ $transaction->customer->name }}
-                                        @else
-                                            N/A
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($transaction->vendor)
-                                            {{ $transaction->vendor->name }}
-                                        @else
-                                            N/A
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($transaction->vehicle)
-                                            {{ $transaction->vehicle->vehicle_number }}
-                                        @else
-                                            N/A
-                                        @endif
-                                    </td>
+                                    @if ($type === 'in')
+                                        <td>
+                                            @if ($transaction->customer)
+                                                {{ $transaction->customer->name }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                    @else
+                                        <td>
+                                            @if ($transaction->vendor)
+                                                {{ $transaction->vendor->name }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($transaction->vehicle)
+                                                {{ $transaction->vehicle->vehicle_number }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                    @endif
                                     <td>{{ $transaction->reference }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                @if($type === 'in')
+                                    <th colspan="2" class="text-right">Total Received:</th>
+                                @else
+                                    <th colspan="2" class="text-right">Total Paid:</th>
+                                @endif
+                                <th>{{ number_format($totalReceivedAmount, 2) }}</th>
+                                <th colspan="{{ $type === 'in' ? 3 : 4 }}"></th>
+                                <!-- Adjust colspan based on transaction type -->
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
