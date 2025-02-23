@@ -131,7 +131,8 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered display nowrap" id="dataTableReport" width="100%" cellspacing="0">
+                    <table class="table table-bordered display nowrap" id="dataTableTransaction" width="100%"
+                        cellspacing="0">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -184,7 +185,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                @if($type === 'in')
+                                @if ($type === 'in')
                                     <th colspan="2" class="text-right">Total Received:</th>
                                 @else
                                     <th colspan="2" class="text-right">Total Paid:</th>

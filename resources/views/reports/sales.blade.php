@@ -153,6 +153,7 @@
                                     $tax_amount = ($amount * $tax_rate) / 100;
                                     $totalAmountAfterTaxRow = $amount + $tax_amount;
 
+                                    // Update totals
                                     $totalAmount += $amount;
                                     $totalTaxAmount += $tax_amount;
                                     $totalAmountAfterTax += $totalAmountAfterTaxRow;

@@ -28,6 +28,10 @@
 
 <body id="page-top">
 
+    @php
+        $type = $type ?? 'default'; // Set a default value for $type
+    @endphp
+
     <!-- Page Wrapper -->
     <div id="wrapper">
         <!-- Sidebar -->
@@ -845,9 +849,101 @@
         });
     </script> --}}
 
+    @php
+        $totalAmount = $totalAmount ?? 0;
+        $totalTaxAmount = $totalTaxAmount ?? 0;
+        $totalAmountAfterTax = $totalAmountAfterTax ?? 0;
+    @endphp
     <script>
         $(document).ready(function() {
-            $('#dataTableReport').DataTable({
+            // Initialize the DataTable
+            var table = $('#dataTableReport').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
+                pageLength: 10,
+                responsive: true,
+                scrollX: true,
+                autoWidth: false,
+                dom: '<"top d-flex justify-content-between align-items-center"lBf>rt<"bottom"ip>',
+                buttons: [{
+                        extend: 'excelHtml5',
+                        text: '<i class="fas fa-file-excel"></i>',
+                        className: 'btn btn-success',
+                        titleAttr: 'Export to Excel',
+                        footer: true,
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fas fa-file-pdf"></i>',
+                        className: 'btn btn-danger',
+                        titleAttr: 'Export to PDF',
+                        orientation: 'landscape',
+                        pageSize: 'A4',
+                        title: 'Sale Report',
+                        footer: true,
+                        customize: function(doc) {
+                            // Center-align all table cells
+                            doc.styles.tableBodyEven.alignment = 'center';
+                            doc.styles.tableBodyOdd.alignment = 'center';
+                            doc.styles.tableHeader.alignment = 'center';
+
+                            // Set table widths
+                            doc.content[1].table.widths = Array(doc.content[1].table.body[0]
+                                .length + 1).join('*').split('');
+
+                            // Add a generated timestamp
+                            doc.content.splice(1, 0, {
+                                text: 'Generated on: ' + new Date().toLocaleString(),
+                                alignment: 'right',
+                                margin: [0, 10, 0, 0] // Top margin
+                            });
+
+                            // Optional: Add a header
+                            doc.header = {
+                                text: 'Sale Report',
+                                alignment: 'center',
+                                margin: [0, 10, 0, 0],
+                                fontSize: 16,
+                                bold: true
+                            };
+
+                            // Add a footer with page numbers
+                            doc.footer = function(currentPage, pageCount) {
+                                return {
+                                    text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
+                                    alignment: 'center',
+                                    margin: [0, 10, 0, 0]
+                                };
+                            };
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print"></i>',
+                        className: 'btn btn-primary',
+                        titleAttr: 'Print',
+                        customize: function(win) {
+                            // Center-align content in the print view
+                            $(win.document.body).find('table td, table th').css('text-align',
+                                'center');
+                        }
+                    }
+                ]
+            });
+        });
+    </script>
+
+    @php
+        $totalReceivedAmount = $totalReceivedAmount ?? 0;
+    @endphp
+    <script>
+        $(document).ready(function() {
+            $('#dataTableTransaction').DataTable({
                 paging: true,
                 searching: true,
                 ordering: true,
@@ -865,6 +961,7 @@
                         text: '<i class="fas fa-file-excel"></i>',
                         className: 'btn btn-success',
                         titleAttr: 'Export to Excel'
+                        footer: true,
                     },
                     {
                         extend: 'pdfHtml5',
@@ -872,7 +969,44 @@
                         className: 'btn btn-danger',
                         titleAttr: 'Export to PDF',
                         orientation: 'landscape',
-                        pageSize: 'A4'
+                        pageSize: 'A4',
+                        title: '{{ ucfirst($type) }} Transaction Report', // Custom title
+                        footer: true,
+                        customize: function(doc) {
+                            // Center-align all table cells
+                            doc.styles.tableBodyEven.alignment = 'center';
+                            doc.styles.tableBodyOdd.alignment = 'center';
+                            doc.styles.tableHeader.alignment = 'center';
+
+                            // Set table widths
+                            doc.content[1].table.widths = Array(doc.content[1].table.body[0]
+                                .length + 1).join('*').split('');
+
+                            // Add a header
+                            doc.header = {
+                                text: '{{ ucfirst($type) }} Transaction Report',
+                                alignment: 'center',
+                                margin: [0, 10, 0, 0],
+                                fontSize: 16,
+                                bold: true
+                            };
+
+                            // Add a footer
+                            doc.footer = function(currentPage, pageCount) {
+                                return {
+                                    text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
+                                    alignment: 'center',
+                                    margin: [0, 10, 0, 0]
+                                };
+                            };
+
+                            // Add a generated timestamp
+                            doc.content.splice(1, 0, {
+                                text: 'Generated on: ' + new Date().toLocaleString(),
+                                alignment: 'right',
+                                margin: [0, 10, 0, 0] // Top margin
+                            });
+                        }
                     },
                     {
                         extend: 'print',

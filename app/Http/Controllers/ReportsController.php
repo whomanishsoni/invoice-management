@@ -37,6 +37,7 @@ class ReportsController extends Controller
 
         return view('reports.sales', compact('sales', 'rawana',  'customers'));
     }
+
     public function transactionReport(Request $request, $type)
     {
         // Validate the type parameter
