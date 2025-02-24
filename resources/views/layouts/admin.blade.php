@@ -809,10 +809,26 @@
         });
     </script>
 
-    {{-- <script>
+    @php
+        $totalAmount = $totalAmount ?? 0;
+        $totalTaxAmount = $totalTaxAmount ?? 0;
+        $totalAmountAfterTax = $totalAmountAfterTax ?? 0;
+    @endphp
+    <script>
         $(document).ready(function() {
-            $('#dataTableReport').DataTable({
-                paging: true, // Enables pagination
+            function getTimestamp() {
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = String(now.getMonth() + 1).padStart(2, '0');
+                var day = String(now.getDate()).padStart(2, '0');
+                var hours = String(now.getHours()).padStart(2, '0');
+                var minutes = String(now.getMinutes()).padStart(2, '0');
+                var seconds = String(now.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+            }
+
+            var table = $('#dataTableReport').DataTable({
+                paging: true,
                 searching: true,
                 ordering: true,
                 lengthMenu: [
@@ -823,12 +839,32 @@
                 responsive: true,
                 scrollX: true,
                 autoWidth: false,
-                dom: '<"top"B><"clear"><"middle"lf>rt<"bottom"ip>', // Customized dom option
+                dom: '<"top d-flex justify-content-between align-items-center"lBf>rt<"bottom"ip>',
                 buttons: [{
                         extend: 'excelHtml5',
                         text: '<i class="fas fa-file-excel"></i>',
                         className: 'btn btn-success',
-                        titleAttr: 'Export to Excel'
+                        titleAttr: 'Export to Excel',
+                        footer: false,
+                        filename: 'Sale_Report_' + getTimestamp(),
+                        customizeData: function(data) {
+                            var footerRow = [];
+
+                            for (var i = 0; i < 6; i++) {
+                                footerRow.push('');
+                            }
+                            footerRow.push('Total:');
+
+                            footerRow.push('{{ number_format($totalAmount, 2) }}');
+
+                            footerRow.push('');
+
+                            footerRow.push('{{ number_format($totalTaxAmount, 2) }}');
+
+                            footerRow.push('{{ number_format($totalAmountAfterTax, 2) }}');
+
+                            data.body.push(footerRow);
+                        }
                     },
                     {
                         extend: 'pdfHtml5',
@@ -836,27 +872,141 @@
                         className: 'btn btn-danger',
                         titleAttr: 'Export to PDF',
                         orientation: 'landscape',
-                        pageSize: 'A4'
+                        pageSize: 'A4',
+                        title: 'Sale Report',
+                        filename: 'Sale_Report_' + getTimestamp(),
+                        footer: false,
+                        customize: function(doc) {
+                            doc.styles.tableBodyEven.alignment = 'center';
+                            doc.styles.tableBodyOdd.alignment = 'center';
+                            doc.styles.tableHeader.alignment = 'center';
+
+                            doc.content[1].table.widths = Array(doc.content[1].table.body[0]
+                                .length + 1).join('*').split('');
+
+                            doc.content.splice(1, 0, {
+                                text: 'Generated on: ' + new Date().toLocaleString(),
+                                alignment: 'right',
+                                margin: [0, 10, 0, 0]
+                            });
+
+                            doc.footer = function(currentPage, pageCount) {
+                                return {
+                                    text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
+                                    alignment: 'center',
+                                    margin: [0, 10, 0, 0]
+                                };
+                            };
+
+                            doc.content.push({
+                                margin: [0, 10, 0, 0],
+                                table: {
+                                    widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*',
+                                        '*', '*'
+                                    ],
+                                    body: [
+                                        [{
+                                                text: 'Total:',
+                                                colSpan: 7,
+                                                alignment: 'right',
+                                                fillColor: '#2C3C4C',
+                                                color: '#FFFFFF',
+                                                border: [false, false, false,
+                                                    false
+                                                ],
+                                                bold: true,
+                                                fontSize: 11
+                                            },
+                                            {},
+                                            {},
+                                            {},
+                                            {},
+                                            {},
+                                            {},
+                                            {
+                                                text: '{{ number_format($totalAmount, 2) }}',
+                                                alignment: 'center',
+                                                fillColor: '#2C3C4C',
+                                                color: '#FFFFFF',
+                                                border: [false, false, false,
+                                                    false
+                                                ],
+                                                bold: true,
+                                                fontSize: 11
+                                            },
+                                            {
+                                                text: '',
+                                                alignment: 'center',
+                                                fillColor: '#2C3C4C',
+                                                color: '#FFFFFF',
+                                                border: [false, false, false,
+                                                    false
+                                                ],
+                                                bold: true,
+                                                fontSize: 11
+                                            },
+                                            {
+                                                text: '{{ number_format($totalTaxAmount, 2) }}',
+                                                alignment: 'center',
+                                                fillColor: '#2C3C4C',
+                                                color: '#FFFFFF',
+                                                border: [false, false, false,
+                                                    false
+                                                ],
+                                                bold: true,
+                                                fontSize: 11
+                                            },
+                                            {
+                                                text: '{{ number_format($totalAmountAfterTax, 2) }}',
+                                                alignment: 'center',
+                                                fillColor: '#2C3C4C',
+                                                color: '#FFFFFF',
+                                                border: [false, false, false,
+                                                    false
+                                                ],
+                                                bold: true,
+                                                fontSize: 11
+                                            }
+                                        ]
+                                    ]
+                                }
+                            });
+                        }
                     },
                     {
                         extend: 'print',
                         text: '<i class="fas fa-print"></i>',
                         className: 'btn btn-primary',
-                        titleAttr: 'Print'
+                        titleAttr: 'Print',
+                        customize: function(win) {
+                            $(win.document.body).find('table td, table th').css('text-align',
+                                'center');
+                        }
                     }
                 ]
             });
         });
-    </script> --}}
+    </script>
 
-    @php
+    {{-- @php
         $totalAmount = $totalAmount ?? 0;
         $totalTaxAmount = $totalTaxAmount ?? 0;
         $totalAmountAfterTax = $totalAmountAfterTax ?? 0;
     @endphp
     <script>
         $(document).ready(function() {
-            // Initialize the DataTable
+            // Function to generate a timestamp for the file name
+            function getTimestamp() {
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                var day = String(now.getDate()).padStart(2, '0');
+                var hours = String(now.getHours()).padStart(2, '0');
+                var minutes = String(now.getMinutes()).padStart(2, '0');
+                var seconds = String(now.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+            }
+
             var table = $('#dataTableReport').DataTable({
                 paging: true,
                 searching: true,
@@ -876,6 +1026,25 @@
                         className: 'btn btn-success',
                         titleAttr: 'Export to Excel',
                         footer: true,
+                        filename: 'Sale_Report_' + getTimestamp(), // Add timestamp to file name
+                        customizeData: function(data) {
+                            // Add custom footer row
+                            var footerRow = [];
+
+                            // Add empty cells for the first 7 columns
+                            for (var i = 0; i < 7; i++) {
+                                footerRow.push('');
+                            }
+
+                            // Add the total amount, tax amount, and total amount after tax
+                            footerRow.push('{{ number_format($totalAmount, 2) }}');
+                            footerRow.push('');
+                            footerRow.push('{{ number_format($totalTaxAmount, 2) }}');
+                            footerRow.push('{{ number_format($totalAmountAfterTax, 2) }}');
+
+                            // Add the footer row to the data
+                            data.body.push(footerRow);
+                        }
                     },
                     {
                         extend: 'pdfHtml5',
@@ -885,34 +1054,22 @@
                         orientation: 'landscape',
                         pageSize: 'A4',
                         title: 'Sale Report',
-                        footer: true,
+                        filename: 'Sale_Report_' + getTimestamp(), // Add timestamp to file name
+                        footer: false,
                         customize: function(doc) {
-                            // Center-align all table cells
                             doc.styles.tableBodyEven.alignment = 'center';
                             doc.styles.tableBodyOdd.alignment = 'center';
                             doc.styles.tableHeader.alignment = 'center';
 
-                            // Set table widths
                             doc.content[1].table.widths = Array(doc.content[1].table.body[0]
                                 .length + 1).join('*').split('');
 
-                            // Add a generated timestamp
                             doc.content.splice(1, 0, {
                                 text: 'Generated on: ' + new Date().toLocaleString(),
                                 alignment: 'right',
-                                margin: [0, 10, 0, 0] // Top margin
+                                margin: [0, 10, 0, 0]
                             });
 
-                            // Optional: Add a header
-                            doc.header = {
-                                text: 'Sale Report',
-                                alignment: 'center',
-                                margin: [0, 10, 0, 0],
-                                fontSize: 16,
-                                bold: true
-                            };
-
-                            // Add a footer with page numbers
                             doc.footer = function(currentPage, pageCount) {
                                 return {
                                     text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
@@ -920,6 +1077,80 @@
                                     margin: [0, 10, 0, 0]
                                 };
                             };
+
+                            doc.content.push({
+                                margin: [0, 10, 0, 0],
+                                table: {
+                                    widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*',
+                                        '*', '*'
+                                    ],
+                                    body: [
+                                        [{
+                                                text: 'Total:',
+                                                colSpan: 7,
+                                                alignment: 'right',
+                                                fillColor: '#2C3C4C',
+                                                color: '#FFFFFF',
+                                                border: [false, false, false,
+                                                    false
+                                                ],
+                                                bold: true,
+                                                fontSize: 11
+                                            },
+                                            {},
+                                            {},
+                                            {},
+                                            {},
+                                            {},
+                                            {},
+                                            {
+                                                text: '{{ number_format($totalAmount, 2) }}',
+                                                alignment: 'center',
+                                                fillColor: '#2C3C4C',
+                                                color: '#FFFFFF',
+                                                border: [false, false, false,
+                                                    false
+                                                ],
+                                                bold: true,
+                                                fontSize: 11
+                                            },
+                                            {
+                                                text: '',
+                                                alignment: 'center',
+                                                fillColor: '#2C3C4C',
+                                                color: '#FFFFFF',
+                                                border: [false, false, false,
+                                                    false
+                                                ],
+                                                bold: true,
+                                                fontSize: 11
+                                            },
+                                            {
+                                                text: '{{ number_format($totalTaxAmount, 2) }}',
+                                                alignment: 'center',
+                                                fillColor: '#2C3C4C',
+                                                color: '#FFFFFF',
+                                                border: [false, false, false,
+                                                    false
+                                                ],
+                                                bold: true,
+                                                fontSize: 11
+                                            },
+                                            {
+                                                text: '{{ number_format($totalAmountAfterTax, 2) }}',
+                                                alignment: 'center',
+                                                fillColor: '#2C3C4C',
+                                                color: '#FFFFFF',
+                                                border: [false, false, false,
+                                                    false
+                                                ],
+                                                bold: true,
+                                                fontSize: 11
+                                            }
+                                        ]
+                                    ]
+                                }
+                            });
                         }
                     },
                     {
@@ -928,7 +1159,6 @@
                         className: 'btn btn-primary',
                         titleAttr: 'Print',
                         customize: function(win) {
-                            // Center-align content in the print view
                             $(win.document.body).find('table td, table th').css('text-align',
                                 'center');
                         }
@@ -936,13 +1166,24 @@
                 ]
             });
         });
-    </script>
+    </script> --}}
 
     @php
         $totalReceivedAmount = $totalReceivedAmount ?? 0;
     @endphp
     <script>
         $(document).ready(function() {
+            function getTimestamp() {
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                var day = String(now.getDate()).padStart(2, '0');
+                var hours = String(now.getHours()).padStart(2, '0');
+                var minutes = String(now.getMinutes()).padStart(2, '0');
+                var seconds = String(now.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+            }
+
             $('#dataTableTransaction').DataTable({
                 paging: true,
                 searching: true,
@@ -960,8 +1201,33 @@
                         extend: 'excelHtml5',
                         text: '<i class="fas fa-file-excel"></i>',
                         className: 'btn btn-success',
-                        titleAttr: 'Export to Excel'
-                        footer: true,
+                        titleAttr: 'Export to Excel',
+                        footer: false, // Disable default footer
+                        filename: '{{ ucfirst($type) }}_Transaction_Report_' +
+                            getTimestamp(), // Add timestamp to file name
+                        customizeData: function(data) {
+                            // Add custom footer row
+                            var footerLabel =
+                                '{{ $type === 'in' ? 'Total Received:' : 'Total Paid:' }}';
+                            var footerRow = [];
+
+                            // Add empty cell for the first column (#)
+                            footerRow.push('');
+
+                            // Add the footer label in the Date column
+                            footerRow.push(footerLabel);
+
+                            // Add the total amount in the Amount column
+                            footerRow.push('{{ number_format($totalReceivedAmount, 2) }}');
+
+                            // Add empty cells for the remaining columns
+                            for (var i = 3; i < data.body[0].length; i++) {
+                                footerRow.push('');
+                            }
+
+                            // Add the footer row to the data
+                            data.body.push(footerRow);
+                        }
                     },
                     {
                         extend: 'pdfHtml5',
@@ -970,42 +1236,90 @@
                         titleAttr: 'Export to PDF',
                         orientation: 'landscape',
                         pageSize: 'A4',
-                        title: '{{ ucfirst($type) }} Transaction Report', // Custom title
-                        footer: true,
+                        title: '{{ ucfirst($type) }} Transaction Report', // PDF title
+                        filename: '{{ ucfirst($type) }}_Transaction_Report_' +
+                            getTimestamp(), // Add timestamp to file name
+                        footer: false,
                         customize: function(doc) {
-                            // Center-align all table cells
-                            doc.styles.tableBodyEven.alignment = 'center';
-                            doc.styles.tableBodyOdd.alignment = 'center';
-                            doc.styles.tableHeader.alignment = 'center';
+                            if (doc.content && doc.content.length > 1 && doc.content[1].table && doc
+                                .content[1].table.body) {
+                                doc.styles.tableBodyEven.alignment = 'center';
+                                doc.styles.tableBodyOdd.alignment = 'center';
+                                doc.styles.tableHeader.alignment = 'center';
 
-                            // Set table widths
-                            doc.content[1].table.widths = Array(doc.content[1].table.body[0]
-                                .length + 1).join('*').split('');
+                                var colCount = doc.content[1].table.body[0].length;
+                                doc.content[1].table.widths = Array(colCount).fill('*');
 
-                            // Add a header
-                            doc.header = {
-                                text: '{{ ucfirst($type) }} Transaction Report',
-                                alignment: 'center',
-                                margin: [0, 10, 0, 0],
-                                fontSize: 16,
-                                bold: true
-                            };
-
-                            // Add a footer
-                            doc.footer = function(currentPage, pageCount) {
-                                return {
-                                    text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
-                                    alignment: 'center',
-                                    margin: [0, 10, 0, 0]
+                                doc.footer = function(currentPage, pageCount) {
+                                    return {
+                                        text: 'Page ' + currentPage.toString() + ' of ' +
+                                            pageCount,
+                                        alignment: 'center',
+                                        margin: [0, 10, 0, 0]
+                                    };
                                 };
-                            };
 
-                            // Add a generated timestamp
-                            doc.content.splice(1, 0, {
-                                text: 'Generated on: ' + new Date().toLocaleString(),
-                                alignment: 'right',
-                                margin: [0, 10, 0, 0] // Top margin
-                            });
+                                // Add a generated timestamp to the PDF content
+                                doc.content.splice(1, 0, {
+                                    text: 'Generated on: ' + new Date().toLocaleString(),
+                                    alignment: 'right',
+                                    margin: [0, 10, 0, 0]
+                                });
+
+                                var footerLabel =
+                                    '{{ $type === 'in' ? 'Total Received:' : 'Total Paid:' }}';
+                                var colspan =
+                                    {{ $type === 'in' ? 3 : 4 }};
+
+                                doc.content.push({
+                                    margin: [0, 10, 0, 0],
+                                    table: {
+                                        widths: Array(colCount).fill('*'),
+                                        body: [
+                                            [{
+                                                    text: footerLabel,
+                                                    colSpan: 2,
+                                                    alignment: 'right',
+                                                    fillColor: '#2C3C4C',
+                                                    color: '#FFFFFF',
+                                                    border: [false, false, false,
+                                                        false
+                                                    ],
+                                                    bold: true,
+                                                    fontSize: 11
+                                                },
+                                                {},
+                                                {
+                                                    text: '{{ number_format($totalReceivedAmount, 2) }}',
+                                                    alignment: 'center',
+                                                    fillColor: '#2C3C4C',
+                                                    color: '#FFFFFF',
+                                                    border: [false, false, false,
+                                                        false
+                                                    ],
+                                                    bold: true,
+                                                    fontSize: 11
+                                                },
+                                                {
+                                                    text: '',
+                                                    colSpan: colspan,
+                                                    alignment: 'center',
+                                                    fillColor: '#2C3C4C',
+                                                    color: '#FFFFFF',
+                                                    border: [false, false, false,
+                                                        false
+                                                    ],
+                                                    bold: true,
+                                                    fontSize: 11
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                });
+                            } else {
+                                console.error(
+                                    'PDF content structure is invalid or missing table data.');
+                            }
                         }
                     },
                     {
