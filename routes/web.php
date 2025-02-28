@@ -44,6 +44,7 @@ Route::put('/profile', 'ProfileController@update')->name('profile.update');
 
 Route::prefix('customers')->name('customers.')->group(function () {
     Route::get('search', [CustomerController::class, 'search'])->name('search');
+    Route::get('data', [CustomerController::class, 'data'])->name('data');
     Route::get('/', [CustomerController::class, 'index'])->name('index');
     Route::get('create', [CustomerController::class, 'create'])->name('create');
     Route::post('/', [CustomerController::class, 'store'])->name('store');

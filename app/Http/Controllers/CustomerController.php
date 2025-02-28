@@ -5,15 +5,61 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\State;
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Cache;
 
 class CustomerController extends Controller
 {
 
-    public function index()
-    {
-        $customers = Customer::with('state')->get();
+    // public function index()
+    // {
+    //     $customers = Customer::with('state')->get();
 
-        return view('customers.index', compact('customers'));
+    //     return view('customers.index', compact('customers'));
+    // }
+
+    public function index(Request $request)
+    {
+        if ($request->ajax()) {
+            $searchTerm = $request->input('search.value');
+
+            $data = Customer::with('state:id,name')
+                ->select([
+                    'id',
+                    'name',
+                    'email',
+                    'phone',
+                    'city',
+                    'state_id',
+                    'gst_number'
+                ])
+                ->when($searchTerm, function ($query, $searchTerm) {
+                    return $query->where('name', 'like', "%$searchTerm%")
+                        ->orWhere('email', 'like', "%$searchTerm%")
+                        ->orWhere('phone', 'like', "%$searchTerm%")
+                        ->orWhere('city', 'like', "%$searchTerm%")
+                        ->orWhere('gst_number', 'like', "%$searchTerm%");
+                });
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    $btn = '<div class="d-flex">';
+                    $btn .= '<a href="' . route('customers.show', $row->id) . '" class="btn btn-primary" style="margin-right: 3px;" data-toggle="tooltip" data-placement="top" title="View Customer"><i class="fas fa-eye"></i></a>';
+                    $btn .= '<a href="' . route('customers.edit', $row->id) . '" class="btn btn-warning" style="margin-right: 3px;" data-toggle="tooltip" data-placement="top" title="Edit Customer"><i class="fas fa-edit"></i></a>';
+                    $btn .= '<form action="' . route('customers.destroy', $row->id) . '" method="POST" style="display: inline;">';
+                    $btn .= csrf_field();
+                    $btn .= method_field('DELETE');
+                    $btn .= '<button type="submit" class="btn btn-danger" style="margin-right: 3px;" data-toggle="tooltip" data-placement="top" title="Delete Customer" onclick="return confirm(\'Are you sure you want to delete this customer?\');"><i class="fas fa-trash-alt"></i></button>';
+                    $btn .= '</form>';
+                    $btn .= '</div>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        return view('customers.index');
     }
 
     public function create()
