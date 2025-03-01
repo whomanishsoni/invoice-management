@@ -23,7 +23,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered" id="customers-table" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -36,44 +36,42 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($customers as $index => $customer)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $customer->name }}</td>
-                                    <td>{{ $customer->email }}</td>
-                                    <td>{{ $customer->phone }}</td>
-                                    <td>{{ ucwords($customer->city) }}</td>
-                                    <td>{{ $customer->state->name }}</td>
-                                    <td>{{ $customer->gst_number }}</td>
-                                    <td>
-                                        <div class="d-flex">
-                                            <a href="{{ route('customers.show', $customer->id) }}" class="btn btn-primary"
-                                                style="margin-right: 3px;" data-toggle="tooltip" data-placement="top" title="View Customer">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-warning"
-                                                style="margin-right: 3px;" data-toggle="tooltip" data-placement="top" title="Edit Customer">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="{{ route('customers.destroy', $customer->id) }}" method="POST"
-                                                style="display: inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger" style="margin-right: 3px;" data-toggle="tooltip"
-                                                    data-placement="top" title="Delete Customer"
-                                                    onclick="return confirm('Are you sure you want to delete this customer?');">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('#customers-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('customers.index') }}",
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'name', name: 'name' },
+                { data: 'email', name: 'email' },
+                { data: 'phone', name: 'phone' },
+                { data: 'city', name: 'city' },
+                { data: 'state.name', name: 'state.name' },
+                { data: 'gst_number', name: 'gst_number' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
+            ],
+            paging: true,
+            searching: true,
+            ordering: true,
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "All"]
+            ],
+            pageLength: 10,
+            responsive: true,
+            scrollX: true,
+            autoWidth: false
+        });
+    });
+</script>
+@endpush

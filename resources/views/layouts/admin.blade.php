@@ -791,7 +791,7 @@
         });
     </script>
 
-    <script>
+    {{-- <script>
         $(document).ready(function() {
             $('#dataTable').DataTable({
                 paging: true,
@@ -807,9 +807,9 @@
                 autoWidth: false
             });
         });
-    </script>
+    </script> --}}
 
-    @php
+    {{-- @php
         $totalAmount = $totalAmount ?? 0;
         $totalTaxAmount = $totalTaxAmount ?? 0;
         $totalAmountAfterTax = $totalAmountAfterTax ?? 0;
@@ -988,185 +988,6 @@
         });
     </script>
 
-    {{-- @php
-        $totalAmount = $totalAmount ?? 0;
-        $totalTaxAmount = $totalTaxAmount ?? 0;
-        $totalAmountAfterTax = $totalAmountAfterTax ?? 0;
-    @endphp
-    <script>
-        $(document).ready(function() {
-            // Function to generate a timestamp for the file name
-            function getTimestamp() {
-                var now = new Date();
-                var year = now.getFullYear();
-                var month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-                var day = String(now.getDate()).padStart(2, '0');
-                var hours = String(now.getHours()).padStart(2, '0');
-                var minutes = String(now.getMinutes()).padStart(2, '0');
-                var seconds = String(now.getSeconds()).padStart(2, '0');
-                return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
-            }
-
-            var table = $('#dataTableReport').DataTable({
-                paging: true,
-                searching: true,
-                ordering: true,
-                lengthMenu: [
-                    [10, 25, 50, -1],
-                    [10, 25, 50, "All"]
-                ],
-                pageLength: 10,
-                responsive: true,
-                scrollX: true,
-                autoWidth: false,
-                dom: '<"top d-flex justify-content-between align-items-center"lBf>rt<"bottom"ip>',
-                buttons: [{
-                        extend: 'excelHtml5',
-                        text: '<i class="fas fa-file-excel"></i>',
-                        className: 'btn btn-success',
-                        titleAttr: 'Export to Excel',
-                        footer: true,
-                        filename: 'Sale_Report_' + getTimestamp(), // Add timestamp to file name
-                        customizeData: function(data) {
-                            // Add custom footer row
-                            var footerRow = [];
-
-                            // Add empty cells for the first 7 columns
-                            for (var i = 0; i < 7; i++) {
-                                footerRow.push('');
-                            }
-
-                            // Add the total amount, tax amount, and total amount after tax
-                            footerRow.push('{{ number_format($totalAmount, 2) }}');
-                            footerRow.push('');
-                            footerRow.push('{{ number_format($totalTaxAmount, 2) }}');
-                            footerRow.push('{{ number_format($totalAmountAfterTax, 2) }}');
-
-                            // Add the footer row to the data
-                            data.body.push(footerRow);
-                        }
-                    },
-                    {
-                        extend: 'pdfHtml5',
-                        text: '<i class="fas fa-file-pdf"></i>',
-                        className: 'btn btn-danger',
-                        titleAttr: 'Export to PDF',
-                        orientation: 'landscape',
-                        pageSize: 'A4',
-                        title: 'Sale Report',
-                        footer: true,
-                        customize: function(doc) {
-                            doc.styles.tableBodyEven.alignment = 'center';
-                            doc.styles.tableBodyOdd.alignment = 'center';
-                            doc.styles.tableHeader.alignment = 'center';
-
-                            doc.content[1].table.widths = Array(doc.content[1].table.body[0]
-                                .length + 1).join('*').split('');
-
-                            doc.content.splice(1, 0, {
-                                text: 'Generated on: ' + new Date().toLocaleString(),
-                                alignment: 'right',
-                                margin: [0, 10, 0, 0]
-                            });
-
-                            doc.footer = function(currentPage, pageCount) {
-                                return {
-                                    text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
-                                    alignment: 'center',
-                                    margin: [0, 10, 0, 0]
-                                };
-                            };
-
-                            doc.content.push({
-                                margin: [0, 10, 0, 0],
-                                table: {
-                                    widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*',
-                                        '*', '*'
-                                    ],
-                                    body: [
-                                        [{
-                                                text: 'Total:',
-                                                colSpan: 7,
-                                                alignment: 'right',
-                                                fillColor: '#2C3C4C',
-                                                color: '#FFFFFF',
-                                                border: [false, false, false,
-                                                    false
-                                                ],
-                                                bold: true,
-                                                fontSize: 11
-                                            },
-                                            {},
-                                            {},
-                                            {},
-                                            {},
-                                            {},
-                                            {},
-                                            {
-                                                text: '{{ number_format($totalAmount, 2) }}',
-                                                alignment: 'center',
-                                                fillColor: '#2C3C4C',
-                                                color: '#FFFFFF',
-                                                border: [false, false, false,
-                                                    false
-                                                ],
-                                                bold: true,
-                                                fontSize: 11
-                                            },
-                                            {
-                                                text: '',
-                                                alignment: 'center',
-                                                fillColor: '#2C3C4C',
-                                                color: '#FFFFFF',
-                                                border: [false, false, false,
-                                                    false
-                                                ],
-                                                bold: true,
-                                                fontSize: 11
-                                            },
-                                            {
-                                                text: '{{ number_format($totalTaxAmount, 2) }}',
-                                                alignment: 'center',
-                                                fillColor: '#2C3C4C',
-                                                color: '#FFFFFF',
-                                                border: [false, false, false,
-                                                    false
-                                                ],
-                                                bold: true,
-                                                fontSize: 11
-                                            },
-                                            {
-                                                text: '{{ number_format($totalAmountAfterTax, 2) }}',
-                                                alignment: 'center',
-                                                fillColor: '#2C3C4C',
-                                                color: '#FFFFFF',
-                                                border: [false, false, false,
-                                                    false
-                                                ],
-                                                bold: true,
-                                                fontSize: 11
-                                            }
-                                        ]
-                                    ]
-                                }
-                            });
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        text: '<i class="fas fa-print"></i>',
-                        className: 'btn btn-primary',
-                        titleAttr: 'Print',
-                        customize: function(win) {
-                            $(win.document.body).find('table td, table th').css('text-align',
-                                'center');
-                        }
-                    }
-                ]
-            });
-        });
-    </script> --}}
-
     @php
         $totalReceivedAmount = $totalReceivedAmount ?? 0;
     @endphp
@@ -1200,7 +1021,7 @@
                         extend: 'excelHtml5',
                         text: '<i class="fas fa-file-excel"></i>',
                         className: 'btn btn-success',
-                        titleAttr: 'Export to Excel'
+                        titleAttr: 'Export to Excel',
                         footer: true,
                     },
                     {
@@ -1305,7 +1126,7 @@
                 ]
             });
         });
-    </script>
+    </script> --}}
 
     <script>
         $(document).ready(function() {
