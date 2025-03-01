@@ -2393,6 +2393,7 @@
         },
         {
             "name": "livewire/livewire",
+<<<<<<< HEAD
             "version": "v3.6.0",
             "source": {
                 "type": "git",
@@ -2403,6 +2404,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/livewire/livewire/zipball/4c66b569cb729ba9b2f4a3c4e79f50fd8f2b71d1",
                 "reference": "4c66b569cb729ba9b2f4a3c4e79f50fd8f2b71d1",
+=======
+            "version": "v3.5.20",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/livewire/livewire.git",
+                "reference": "509f2258c51741f6d06deb65d4437654520694e6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/livewire/livewire/zipball/509f2258c51741f6d06deb65d4437654520694e6",
+                "reference": "509f2258c51741f6d06deb65d4437654520694e6",
+>>>>>>> bca396dd42703295621096a87fe7a46b24c33ec8
                 "shasum": ""
             },
             "require": {
@@ -2457,7 +2470,11 @@
             "description": "A front-end framework for Laravel.",
             "support": {
                 "issues": "https://github.com/livewire/livewire/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/livewire/livewire/tree/v3.6.0"
+=======
+                "source": "https://github.com/livewire/livewire/tree/v3.5.20"
+>>>>>>> bca396dd42703295621096a87fe7a46b24c33ec8
             },
             "funding": [
                 {
@@ -2465,7 +2482,11 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-26T00:57:32+00:00"
+=======
+            "time": "2025-02-13T21:05:24+00:00"
+>>>>>>> bca396dd42703295621096a87fe7a46b24c33ec8
         },
         {
             "name": "maennchen/zipstream-php",
@@ -7305,6 +7326,7 @@
         },
         {
             "name": "yajra/laravel-datatables-export",
+<<<<<<< HEAD
             "version": "v11.4.2",
             "source": {
                 "type": "git",
@@ -7315,6 +7337,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/yajra/laravel-datatables-export/zipball/077cdf12af780448715ad169446cf753d997f91f",
                 "reference": "077cdf12af780448715ad169446cf753d997f91f",
+=======
+            "version": "v11.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yajra/laravel-datatables-export.git",
+                "reference": "f1c08aa435b265f735e87d84af9c1799c5207122"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yajra/laravel-datatables-export/zipball/f1c08aa435b265f735e87d84af9c1799c5207122",
+                "reference": "f1c08aa435b265f735e87d84af9c1799c5207122",
+>>>>>>> bca396dd42703295621096a87fe7a46b24c33ec8
                 "shasum": ""
             },
             "require": {
@@ -7370,7 +7404,11 @@
             ],
             "support": {
                 "issues": "https://github.com/yajra/laravel-datatables-export/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/yajra/laravel-datatables-export/tree/v11.4.2"
+=======
+                "source": "https://github.com/yajra/laravel-datatables-export/tree/v11.4.1"
+>>>>>>> bca396dd42703295621096a87fe7a46b24c33ec8
             },
             "funding": [
                 {
@@ -7378,7 +7416,11 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-26T03:05:22+00:00"
+=======
+            "time": "2025-02-19T05:45:55+00:00"
+>>>>>>> bca396dd42703295621096a87fe7a46b24c33ec8
         },
         {
             "name": "yajra/laravel-datatables-fractal",
