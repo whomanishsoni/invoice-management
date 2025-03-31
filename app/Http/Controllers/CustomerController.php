@@ -22,11 +22,7 @@ class CustomerController extends Controller
     {
         if ($request->ajax()) {
             $searchTerm = $request->input('search.value');
-<<<<<<< HEAD
     
-=======
-
->>>>>>> bca396dd42703295621096a87fe7a46b24c33ec8
             $data = Customer::with('state:id,name')
                 ->select([
                     'id',
@@ -39,27 +35,12 @@ class CustomerController extends Controller
                 ])
                 ->when($searchTerm, function ($query, $searchTerm) {
                     return $query->where('name', 'like', "%$searchTerm%")
-<<<<<<< HEAD
-                                 ->orWhere('email', 'like', "%$searchTerm%")
-                                 ->orWhere('phone', 'like', "%$searchTerm%")
-                                 ->orWhere('city', 'like', "%$searchTerm%")
-                                 ->orWhere('gst_number', 'like', "%$searchTerm%");
-                });
-    
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('action', function($row){
-                    $btn = '<div class="d-flex">';
-                    $btn .= '<a href="'.route('customers.show', $row->id).'" class="btn btn-primary" style="margin-right: 3px;" data-toggle="tooltip" data-placement="top" title="View Customer"><i class="fas fa-eye"></i></a>';
-                    $btn .= '<a href="'.route('customers.edit', $row->id).'" class="btn btn-warning" style="margin-right: 3px;" data-toggle="tooltip" data-placement="top" title="Edit Customer"><i class="fas fa-edit"></i></a>';
-                    $btn .= '<form action="'.route('customers.destroy', $row->id).'" method="POST" style="display: inline;">';
-=======
                         ->orWhere('email', 'like', "%$searchTerm%")
                         ->orWhere('phone', 'like', "%$searchTerm%")
                         ->orWhere('city', 'like', "%$searchTerm%")
                         ->orWhere('gst_number', 'like', "%$searchTerm%");
                 });
-
+    
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -67,7 +48,6 @@ class CustomerController extends Controller
                     $btn .= '<a href="' . route('customers.show', $row->id) . '" class="btn btn-primary" style="margin-right: 3px;" data-toggle="tooltip" data-placement="top" title="View Customer"><i class="fas fa-eye"></i></a>';
                     $btn .= '<a href="' . route('customers.edit', $row->id) . '" class="btn btn-warning" style="margin-right: 3px;" data-toggle="tooltip" data-placement="top" title="Edit Customer"><i class="fas fa-edit"></i></a>';
                     $btn .= '<form action="' . route('customers.destroy', $row->id) . '" method="POST" style="display: inline;">';
->>>>>>> bca396dd42703295621096a87fe7a46b24c33ec8
                     $btn .= csrf_field();
                     $btn .= method_field('DELETE');
                     $btn .= '<button type="submit" class="btn btn-danger" style="margin-right: 3px;" data-toggle="tooltip" data-placement="top" title="Delete Customer" onclick="return confirm(\'Are you sure you want to delete this customer?\');"><i class="fas fa-trash-alt"></i></button>';
@@ -78,11 +58,7 @@ class CustomerController extends Controller
                 ->rawColumns(['action'])
                 ->make(true);
         }
-<<<<<<< HEAD
     
-=======
-
->>>>>>> bca396dd42703295621096a87fe7a46b24c33ec8
         return view('customers.index');
     }
 

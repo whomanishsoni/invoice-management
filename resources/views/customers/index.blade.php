@@ -15,19 +15,25 @@
 
     <div class="container-fluid">
         <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex justify-content-between align-items-left">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
                 <h6 class="m-0 font-weight-bold text-primary">Customer List</h6>
-                <a href="{{ route('customers.create') }}" class="btn btn-primary">
-                    Create Customer
-                </a>
+                <div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            Column Visibility
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right column-visibility-dropdown">
+                        </div>
+                    </div>
+                    <a href="{{ route('customers.create') }}" class="btn btn-primary ml-2">
+                        Create Customer
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-<<<<<<< HEAD
                     <table class="table table-bordered" id="customers-table" width="100%" cellspacing="0">
-=======
-                    <table class="table table-bordered  display nowrap" id="customers-table" width="100%" cellspacing="0">
->>>>>>> bca396dd42703295621096a87fe7a46b24c33ec8
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -48,42 +54,9 @@
 @endsection
 
 @push('scripts')
-<<<<<<< HEAD
-<script>
-    $(document).ready(function() {
-        $('#customers-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('customers.index') }}",
-            columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'name', name: 'name' },
-                { data: 'email', name: 'email' },
-                { data: 'phone', name: 'phone' },
-                { data: 'city', name: 'city' },
-                { data: 'state.name', name: 'state.name' },
-                { data: 'gst_number', name: 'gst_number' },
-                { data: 'action', name: 'action', orderable: false, searchable: false }
-            ],
-            paging: true,
-            searching: true,
-            ordering: true,
-            lengthMenu: [
-                [10, 25, 50, -1],
-                [10, 25, 50, "All"]
-            ],
-            pageLength: 10,
-            responsive: true,
-            scrollX: true,
-            autoWidth: false
-        });
-    });
-</script>
-@endpush
-=======
     <script>
         $(document).ready(function() {
-            $('#customers-table').DataTable({
+            var table = $('#customers-table').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('customers.index') }}",
@@ -132,7 +105,7 @@
                     [10, 25, 50, 100, 500]
                 ],
                 pageLength: 10,
-                responsive: true,
+                responsive: false,
                 scrollX: true,
                 autoWidth: false,
                 dom: '<"row"<"col-sm-12"<"d-flex justify-content-between align-items-center"lBf>>>rtip',
@@ -142,7 +115,37 @@
                         titleAttr: 'Copy to Clipboard',
                         text: '<i class="fas fa-copy"></i>',
                         exportOptions: {
-                            columns: ':not(:last-child)' // Exclude the last column (Action)
+                            columns: ':visible:not(:last-child)'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-warning',
+                        titleAttr: 'Print',
+                        text: '<i class="fas fa-print"></i>',
+                        title: 'customer list', // Set title to an empty string to remove the default title
+                        exportOptions: {
+                            columns: ':visible:not(:last-child)'
+                        },
+                        customize: function(win) {
+                            // Remove any existing title elements
+                            $(win.document.body).find('h1').remove();
+
+                            // $(win.document.body).prepend('<h1 style="font-size: 24px; font-weight: bold; text-align: center;">Customer List</h1>');
+
+                            // Customize the table appearance
+                            $(win.document.body).find('table')
+                                .addClass('display')
+                                .css({
+                                    'font-size': '9px',
+                                    'white-space': 'nowrap'
+                                });
+
+                            // Add alternating row colors
+                            $(win.document.body).find('tr:nth-child(odd) td').css(
+                                'background-color', '#D0D0D0');
+                            $(win.document.body).find('tr:nth-child(even) td').css(
+                                'background-color', '#FFFFFF');
                         }
                     },
                     {
@@ -150,13 +153,13 @@
                         className: 'btn btn-success',
                         titleAttr: 'Export to Excel',
                         text: '<i class="fas fa-file-excel"></i>',
-                        title: 'Customer List', // Custom file name
+                        title: 'Customer List',
                         exportOptions: {
-                            columns: ':not(:last-child)' // Exclude the last column (Action)
+                            columns: ':visible:not(:last-child)'
                         },
                         customize: function(xlsx) {
                             var sheet = xlsx.xl.worksheets['sheet1.xml'];
-                            $('row c', sheet).attr('s', '51'); // Center align text
+                            $('row c', sheet).attr('s', '51');
                         }
                     },
                     {
@@ -164,37 +167,27 @@
                         className: 'btn btn-danger',
                         titleAttr: 'Export to PDF',
                         text: '<i class="fas fa-file-pdf"></i>',
-                        title: 'Customer List', // Custom file name
+                        title: 'Customer List',
                         exportOptions: {
-                            columns: ':not(:last-child)' // Exclude the last column (Action)
+                            columns: ':visible:not(:last-child)'
                         },
                         customize: function(doc) {
-                            // Set page size to A4
                             doc.pageSize = 'A4';
-                            // Set margins (left, top, right, bottom)
                             doc.pageMargins = [20, 40, 20, 40];
-                            // Set default font size
                             doc.defaultStyle.fontSize = 9;
-                            // Left align table headers
                             doc.styles.tableHeader.alignment = 'left';
-                            // Left align table body
                             doc.styles.tableBodyEven.alignment = 'left';
                             doc.styles.tableBodyOdd.alignment = 'left';
-                            // Add a title to the PDF
                             doc.content.splice(0, 0, {
-                                text: 'Customer List',
-                                fontSize: 16,
-                                bold: true,
-                                alignment: 'left',
-                                margin: [0, 0, 0, 20]
+                                columns: [{
+                                    text: 'Generated on: ' + new Date()
+                                        .toLocaleString(),
+                                    alignment: 'right',
+                                    fontSize: 10,
+                                    margin: [0, 0, 0, 20]
+                                }],
+                                columnGap: 10
                             });
-                            // Add generation date
-                            doc.content.splice(1, 0, {
-                                text: 'Generated on: ' + new Date().toLocaleString(),
-                                alignment: 'left',
-                                margin: [0, 10, 0, 0]
-                            });
-                            // Add footer with page numbers
                             doc.footer = function(currentPage, pageCount) {
                                 return {
                                     text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
@@ -202,7 +195,6 @@
                                     margin: [0, 10, 0, 0]
                                 };
                             };
-                            // Adjust table layout
                             doc.content[1].layout = {
                                 hLineWidth: function(i, node) {
                                     return (i === 0 || i === node.table.body.length) ? 1 :
@@ -225,24 +217,34 @@
                                 }
                             };
                         }
-                    },
-                    {
-                        extend: 'print',
-                        className: 'btn btn-warning',
-                        titleAttr: 'Print Table',
-                        text: '<i class="fas fa-print"></i>', // Icon only
-                        exportOptions: {
-                            columns: ':not(:last-child)' // Exclude the last column (Action)
-                        },
-                        customize: function(win) {
-                            $(win.document.body).find('table').addClass('center-aligned').css(
-                                'text-align', 'left');
-                            $(win.document.body).find('h1').css('text-align', 'left');
-                        }
                     }
                 ]
+            });
+
+            table.columns().every(function() {
+                var column = this;
+                var columnIndex = column.index();
+                var columnHeader = $(column.header()).text();
+
+                if (columnHeader !== "#" && columnHeader !== "Action") {
+                    var isVisible = column.visible();
+                    var columnNumber = columnIndex;
+                    var dropdownItem = $(
+                        '<div class="dropdown-item d-flex justify-content-between align-items-center">' +
+                        '<label>' + (columnNumber) + '. ' + columnHeader + '</label>' +
+                        '<span class="checkmark">' + (isVisible ? '✓' : '') + '</span>' +
+                        '</div>'
+                    );
+
+                    $('.column-visibility-dropdown').append(dropdownItem);
+
+                    dropdownItem.on('click', function() {
+                        column.visible(!column.visible());
+                        table.draw();
+                        dropdownItem.find('.checkmark').text(column.visible() ? '✓' : '');
+                    });
+                }
             });
         });
     </script>
 @endpush
->>>>>>> bca396dd42703295621096a87fe7a46b24c33ec8
